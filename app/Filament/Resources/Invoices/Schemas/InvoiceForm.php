@@ -130,13 +130,12 @@ class InvoiceForm
                     ->columns(3),
 
                 Section::make('دفعة أولية')
-                    ->relationship('initialPayment')
+                    ->relationship('initialPayment', fn (array $state): bool => filled($state['amount'] ?? null))
                     ->schema([
                         TextInput::make('amount')
                             ->label('القيمة')
                             ->numeric()
                             ->suffix('د.ل')
-                            ->required()
                             ->minValue(1)
                             ->maxValue(fn($state, $set, $get) => $get('total')),
                     ])
