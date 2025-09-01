@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Filament\Resources\Invoices\Pages;
+
+use App\Filament\Resources\Invoices\InvoiceResource;
+use Filament\Actions;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Support\Enums\TextSize;
+
+class ViewInvoice extends ViewRecord
+{
+    protected static string $resource = InvoiceResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\EditAction::make(),
+            Actions\Action::make('print')
+                ->label('طباعة')
+                ->icon('heroicon-o-printer')
+                ->color('success')
+                ->url(fn($record) => route('invoices.pdf', $record))
+                ->openUrlInNewTab(),
+        ];
+    }
+
+    public function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('تفاصيل')
+                    ->schema([
+                        TextEntry::make('id')
+                            ->label('رقم الفاتورة')
+                            ->size(TextSize::Large),
+
+                        TextEntry::make('customer.name')
+                            ->label('العميل'),
+
+                        TextEntry::make('status')
+                            ->label('الحالة')
+                            ->badge(),
+
+                        TextEntry::make('issue_date')
+                            ->label('تاريخ الفاتورة')
+                            ->date(),
+
+                        TextEntry::make('items_count')
+                            ->counts('items')
+                            ->label('عدد اصناف الفاتورة'),
+
+
+                        TextEntry::make('notes')
+                            ->label('ملاحظات')
+                            ->placeholder('لا يوجد ملاحظات')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
+                Section::make('قيمة الفاتورة')
+                    ->schema([
+                        TextEntry::make('subtotal')
+                            ->label('المجموع')
+                            ->money('LYD'),
+
+                        TextEntry::make('discount')
+                            ->label('الخصم')
+                            ->money('LYD'),
+
+                        TextEntry::make('total')
+                            ->label('المبلغ الإجمالي')
+                            ->money('LYD')
+                            ->weight('bold'),
+
+                        TextEntry::make('paid_amount')
+                            ->label('المدفوع')
+                            ->money('LYD')
+                            ->color('success')
+                            ->weight('bold')
+                            ->size(TextSize::Large),
+
+                        TextEntry::make('remaining')
+                            ->getStateUsing(fn($record) => $record->total - $record->paid_amount)
+                            ->label('المتبقي')
+                            ->money('LYD')
+                            ->weight('bold')
+                            ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
+                    ]),
+            ]);
+    }
+}
