@@ -17,7 +17,8 @@ class PaymentForm
             ->components([
                 Section::make("دفعة للفاتورة #{$invoice?->id}")
                     ->schema([
-                        TextInput::make('القيمة')
+                        TextInput::make('amount')
+                            ->label('القيمة')
                             ->helperText("المبلغ المتبقى: {$remainingAmount}")
                             ->numeric()
                             ->suffix('د.ل')

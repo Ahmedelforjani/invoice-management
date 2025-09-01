@@ -23,7 +23,8 @@ class PaymentsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-        return PaymentsTable::configure($table);
+        $invoice = $this->getOwnerRecord();
+        return PaymentsTable::configure($table, $invoice);
     }
 
     public function isReadOnly(): bool

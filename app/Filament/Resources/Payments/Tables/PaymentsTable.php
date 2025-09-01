@@ -6,10 +6,11 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PaymentsTable
 {
-    public static function configure(Table $table): Table
+    public static function configure(Table $table, ?Model $invoice = null): Table
     {
         return $table
             ->columns([
@@ -29,7 +30,10 @@ class PaymentsTable
                     ->sortable(),
             ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->hidden(
+                        $invoice && $invoice->paid_amount >= $invoice->total
+                    ),
             ])
             ->recordActions([
                 DeleteAction::make(),
