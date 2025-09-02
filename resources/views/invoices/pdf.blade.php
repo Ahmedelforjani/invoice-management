@@ -157,7 +157,7 @@
     <htmlpagefooter name="page-footer">
         <div style="float: right; width: 33%; text-align: right">{{ now()->format('Y/m/d') }}</div>
         <div style="float: right; width: 33%; text-align: center">{PAGENO}</div>
-        <div style="float: left; width: 33%; text-align: left"> {{ auth()?->user()?->name }}</div>
+        <div style="float: left; width: 33%; text-align: left"></div>
     </htmlpagefooter>
 </body>
 

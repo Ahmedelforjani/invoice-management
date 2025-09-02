@@ -21,7 +21,8 @@ class PaymentsTable
 
                 TextColumn::make('amount')
                     ->label('القيمة')
-                    ->money('LYD')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->sortable(),
 
                 TextColumn::make('created_at')

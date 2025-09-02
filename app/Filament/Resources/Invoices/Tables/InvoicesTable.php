@@ -39,7 +39,8 @@ class InvoicesTable
 
                 TextColumn::make('total')
                     ->label('المبلغ الإجمالي')
-                    ->money('LYD')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->sortable(),
 
                 TextColumn::make('issue_date')
@@ -49,14 +50,16 @@ class InvoicesTable
 
                 TextColumn::make('paid_amount')
                     ->label('المدفوع')
-                    ->money('LYD')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->color('success')
                     ->sortable(),
 
                 TextColumn::make('remaining_balance')
                     ->label('المتبقى')
                     ->getStateUsing(fn($record) => $record->total - $record->paid_amount)
-                    ->money('LYD')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
 
                 TextColumn::make('created_at')

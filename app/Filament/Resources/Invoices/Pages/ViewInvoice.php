@@ -64,20 +64,24 @@ class ViewInvoice extends ViewRecord
                     ->schema([
                         TextEntry::make('subtotal')
                             ->label('المجموع')
-                            ->money('LYD'),
+                            ->suffix(' د.ل')
+                            ->formatStateUsing(fn($state) => number_format($state, 2)),
 
                         TextEntry::make('discount')
                             ->label('الخصم')
-                            ->money('LYD'),
+                            ->suffix(' د.ل')
+                            ->formatStateUsing(fn($state) => number_format($state, 2)),
 
                         TextEntry::make('total')
                             ->label('المبلغ الإجمالي')
-                            ->money('LYD')
+                            ->suffix(' د.ل')
+                            ->formatStateUsing(fn($state) => number_format($state, 2))
                             ->weight('bold'),
 
                         TextEntry::make('paid_amount')
                             ->label('المدفوع')
-                            ->money('LYD')
+                            ->suffix(' د.ل')
+                            ->formatStateUsing(fn($state) => number_format($state, 2))
                             ->color('success')
                             ->weight('bold')
                             ->size(TextSize::Large),
@@ -85,7 +89,8 @@ class ViewInvoice extends ViewRecord
                         TextEntry::make('remaining')
                             ->getStateUsing(fn($record) => $record->total - $record->paid_amount)
                             ->label('المتبقي')
-                            ->money('LYD')
+                            ->suffix(' د.ل')
+                            ->formatStateUsing(fn($state) => number_format($state, 2))
                             ->weight('bold')
                             ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
                     ]),

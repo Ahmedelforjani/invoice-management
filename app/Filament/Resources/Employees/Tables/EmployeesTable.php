@@ -24,7 +24,8 @@ class EmployeesTable
                 TextColumn::make('expenses_sum_amount')
                     ->label('المصروفات')
                     ->sum('expenses', 'amount')
-                    ->money('LYD'),
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2)),
 
                 TextColumn::make('created_at')
                     ->label('تاريخ الاضافة')
