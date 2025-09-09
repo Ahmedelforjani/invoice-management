@@ -6,6 +6,7 @@ use App\Filament\Resources\Invoices\InvoiceResource;
 use Filament\Actions;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\TextSize;
@@ -62,38 +63,57 @@ class ViewInvoice extends ViewRecord
 
                 Section::make('قيمة الفاتورة')
                     ->schema([
-                        TextEntry::make('subtotal')
-                            ->label('المجموع')
-                            ->suffix(' د.ل')
-                            ->formatStateUsing(fn($state) => number_format($state, 2)),
+                        Grid::make(1)
+                            ->schema([
+                                TextEntry::make('subtotal_amount')
+                                    ->label('المجموع')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2)),
 
-                        TextEntry::make('discount')
-                            ->label('الخصم')
-                            ->suffix(' د.ل')
-                            ->formatStateUsing(fn($state) => number_format($state, 2)),
+                                TextEntry::make('discount')
+                                    ->label('الخصم')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2)),
 
-                        TextEntry::make('total')
-                            ->label('المبلغ الإجمالي')
-                            ->suffix(' د.ل')
-                            ->formatStateUsing(fn($state) => number_format($state, 2))
-                            ->weight('bold'),
+                                TextEntry::make('total_amount')
+                                    ->label('المبلغ الإجمالي')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                                    ->weight('bold'),
 
-                        TextEntry::make('paid_amount')
-                            ->label('المدفوع')
-                            ->suffix(' د.ل')
-                            ->formatStateUsing(fn($state) => number_format($state, 2))
-                            ->color('success')
-                            ->weight('bold')
-                            ->size(TextSize::Large),
+                                TextEntry::make('paid_amount')
+                                    ->label('المدفوع')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                                    ->color('success')
+                                    ->weight('bold')
+                                    ->size(TextSize::Large),
 
-                        TextEntry::make('remaining')
-                            ->getStateUsing(fn($record) => $record->total - $record->paid_amount)
-                            ->label('المتبقي')
-                            ->suffix(' د.ل')
-                            ->formatStateUsing(fn($state) => number_format($state, 2))
-                            ->weight('bold')
-                            ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
-                    ]),
+                                TextEntry::make('remaining')
+                                    ->getStateUsing(fn($record) => $record->total_amount - $record->paid_amount)
+                                    ->label('المتبقي')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                                    ->weight('bold')
+                                    ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
+                            ]),
+                        Grid::make(1)
+                            ->schema([
+                                TextEntry::make('total_cost')
+                                    ->label('تكلفة الفاتورة')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                                    ->weight('bold'),
+
+                                TextEntry::make('net_profit')
+                                    ->getStateUsing(fn($record) => $record->total_amount - $record->total_cost)
+                                    ->label('الصافي')
+                                    ->suffix(' د.ل')
+                                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                                    ->weight('bold')
+                                    ->color(fn($state) => $state < 0 ? 'danger' : 'success'),
+                                ]),
+                    ])->columns(),
             ]);
     }
 }

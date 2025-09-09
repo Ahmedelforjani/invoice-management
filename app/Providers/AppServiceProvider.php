@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+        Model::automaticallyEagerLoadRelationships();
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch

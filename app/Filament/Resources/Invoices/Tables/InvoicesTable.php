@@ -8,6 +8,7 @@ use App\Filament\Resources\Customers\RelationManagers\InvoicesRelationManager;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -37,7 +38,7 @@ class InvoicesTable
                     ->badge()
                     ->sortable(),
 
-                TextColumn::make('total')
+                TextColumn::make('total_amount')
                     ->label('المبلغ الإجمالي')
                     ->suffix(' د.ل')
                     ->formatStateUsing(fn($state) => number_format($state, 2))
@@ -55,9 +56,9 @@ class InvoicesTable
                     ->color('success')
                     ->sortable(),
 
-                TextColumn::make('remaining_balance')
+                TextColumn::make('remaining')
                     ->label('المتبقى')
-                    ->getStateUsing(fn($record) => $record->total - $record->paid_amount)
+                    ->getStateUsing(fn($record) => $record->total_amount - $record->paid_amount)
                     ->suffix(' د.ل')
                     ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->color(fn($state) => $state > 0 ? 'danger' : 'success'),

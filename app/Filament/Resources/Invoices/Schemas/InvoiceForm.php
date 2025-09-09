@@ -40,18 +40,27 @@ class InvoiceForm
                             ->label('الحالة')
                             ->default(InvoiceStatus::ISSUED)
                             ->options(InvoiceStatus::class)
+                            ->hiddenOn('create')
                             ->required(),
+
+
+                        Textarea::make('notes')
+                            ->label('ملاحظات')
+                            ->placeholder('أدخل أي ملاحظات إضافية')
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 
                 Section::make('اصناف الفاتورة')
-                    ->description('أضف صنف إلى هذه الفاتورة.')
+                    ->description('أضف اصناف الفاتورة.')
                     ->schema([
                         Repeater::make('items')
+                            ->label('الاصناف')
                             ->relationship()
                             ->schema([
                                 TextInput::make('description')
-                                    ->label('الاصناف')
+                                    ->label('الصنف')
                                     ->required()
                                     ->columnSpan(2),
 
@@ -64,7 +73,7 @@ class InvoiceForm
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, $set, $get) {
                                         $unitPrice = $get('unit_price') ?? 0;
-                                        $set('total_price', $state * $unitPrice);
+                                        $set('total', $state * $unitPrice);
                                         self::updateTotals($set, $get);
                                     }),
 
@@ -76,18 +85,18 @@ class InvoiceForm
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, $set, $get) {
                                         $quantity = $get('quantity') ?? 1;
-                                        $set('total_price', $state * $quantity);
+                                        $set('total', $state * $quantity);
                                         self::updateTotals($set, $get);
                                     }),
 
-                                TextInput::make('total_price')
+                                TextInput::make('total')
                                     ->label('السعر الكلي')
                                     ->numeric()
                                     ->suffix('د.ل')
                                     ->disabled()
                                     ->dehydrated(),
                             ])
-                            ->columns(4)
+                            ->columns(5)
                             ->defaultItems(1)
                             ->addActionLabel('إضافة صنف')
                             ->reorderableWithButtons()
@@ -101,9 +110,67 @@ class InvoiceForm
                             ),
                     ]),
 
+                Section::make('مشتريات الفاتورة')
+                    ->description('أضف اصناف الشراء إلى هذه الفاتورة ان وجدت.')
+                    ->schema([
+                        Repeater::make('purchaseItems')
+                            ->label('اصناف الشراء')
+                            ->relationship()
+                            ->schema([
+                                TextInput::make('description')
+                                    ->label('صنف شراء')
+                                    ->required()
+                                    ->columnSpan(2),
+
+                                TextInput::make('quantity')
+                                    ->label('الكمية')
+                                    ->numeric()
+                                    ->default(1)
+                                    ->minValue(1)
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, $set, $get) {
+                                        $unitPrice = $get('unit_price') ?? 0;
+                                        $set('total', $state * $unitPrice);
+                                        self::updateTotals($set, $get);
+                                    }),
+
+                                TextInput::make('unit_price')
+                                    ->label('سعر الوحدة')
+                                    ->numeric()
+                                    ->suffix('د.ل')
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, $set, $get) {
+                                        $quantity = $get('quantity') ?? 1;
+                                        $set('total', $state * $quantity);
+                                        self::updateTotals($set, $get);
+                                    }),
+
+                                TextInput::make('total')
+                                    ->label('التكلفة الكلية')
+                                    ->numeric()
+                                    ->suffix('د.ل')
+                                    ->disabled()
+                                    ->dehydrated(),
+                            ])
+                            ->columns(5)
+                            ->defaultItems(0)
+                            ->addActionLabel('إضافة صنف شراء')
+                            ->reorderableWithButtons()
+                            ->collapsible()
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                self::updateTotals($set, $get);
+                            })
+                            ->deleteAction(
+                                fn($action) => $action->after(fn($set, $get) => self::updateTotals($set, $get))
+                            ),
+                    ]),
+
                 Section::make('قيمة الفاتورة')
                     ->schema([
-                        TextInput::make('subtotal')
+                        TextInput::make('subtotal_amount')
                             ->label('المجموع')
                             ->numeric()
                             ->suffix('د.ل')
@@ -120,16 +187,30 @@ class InvoiceForm
                                 self::updateTotals($set, $get);
                             }),
 
-                        TextInput::make('total')
+                        TextInput::make('total_amount')
                             ->label('المبلغ الإجمالي')
                             ->numeric()
                             ->suffix('د.ل')
                             ->disabled()
                             ->dehydrated(),
+
+                        TextInput::make('total_cost')
+                            ->label('اجمالي التكلفة')
+                            ->numeric()
+                            ->suffix('د.ل')
+                            ->disabled()
+                            ->dehydrated(),
+
+                        TextInput::make('net_profit')
+                            ->label('الصافي')
+                            ->numeric()
+                            ->suffix('د.ل')
+                            ->disabled()
+                            ->dehydrated(false),
                     ])
                     ->columns(3),
 
-                Section::make('دفعة أولية')
+                Section::make('دفعة أولية (عربون)')
                     ->relationship('initialPayment', fn (array $state): bool => filled($state['amount'] ?? null))
                     ->schema([
                         TextInput::make('amount')
@@ -140,14 +221,6 @@ class InvoiceForm
                             ->maxValue(fn($state, $set, $get) => $get('total')),
                     ])
                     ->hiddenOn('edit'),
-
-                Section::make('معلومات إضافية')
-                    ->schema([
-                        Textarea::make('notes')
-                            ->label('ملاحظات')
-                            ->placeholder('أدخل أي ملاحظات إضافية')
-                            ->rows(3),
-                    ]),
             ])->columns(1);
     }
 
@@ -155,6 +228,7 @@ class InvoiceForm
     {
         // Get all items
         $items = $get('items') ?? [];
+        $purchaseItems = $get('purchaseItems') ?? [];
 
         // Calculate subtotal from all items
         $subtotal = collect($items)->sum(function ($item) {
@@ -169,8 +243,18 @@ class InvoiceForm
         // Calculate total
         $total = $subtotal - $discount;
 
+        $totalCost = collect($purchaseItems)->sum(function ($item) {
+            $quantity = (float) ($item['quantity'] ?? 0);
+            $unitPrice = (float) ($item['unit_price'] ?? 0);
+            return $quantity * $unitPrice;
+        });
+
+        $netProfit = $total - $totalCost;
+
         // Update the fields
-        $set('subtotal', number_format($subtotal, 2, '.', ''));
-        $set('total', number_format($total, 2, '.', ''));
+        $set('subtotal_amount', number_format($subtotal, 2, '.', ''));
+        $set('total_amount', number_format($total, 2, '.', ''));
+        $set('total_cost', number_format($totalCost, 2, '.', ''));
+        $set('net_profit', number_format($netProfit, 2, '.', ''));
     }
 }

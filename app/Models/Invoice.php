@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,11 +40,22 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
+    public function purchaseItems(): HasMany
+    {
+        return $this->hasMany(InvoicePurchaseItem::class);
+    }
+
     public function updatePaidAmount(): void
     {
         $this->paid_amount = $this->payments()->sum('amount');
-        if($this->paid_amount >= $this->total) $this->status = InvoiceStatus::PAID;
+        if ($this->paid_amount >= $this->total_amount) $this->status = InvoiceStatus::PAID;
         $this->save();
     }
 
+
+    #[Scope]
+    public function withRemaining(Builder $query): Builder
+    {
+        return $query->addSelect(['remaining' => Invoice::selectRaw('total_amount - paid_amount')]);
+    }
 }

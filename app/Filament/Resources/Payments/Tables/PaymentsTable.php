@@ -33,7 +33,7 @@ class PaymentsTable
             ->headerActions([
                 CreateAction::make()
                     ->hidden(
-                        $invoice && $invoice->paid_amount >= $invoice->total
+                        $invoice && $invoice->paid_amount >= $invoice->total_amount
                     ),
             ])
             ->recordActions([

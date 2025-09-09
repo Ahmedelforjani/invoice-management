@@ -15,6 +15,9 @@ class InvoicePdfController extends Controller
         // Generate PDF
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
 
+//        $pdf->setWatermarkImage(public_path('images/logo.png'), 0.2, 'F', 'F'); // path, alpha, 'F' for fixed size, 'F' for fixed position
+        $pdf->showWatermarkImage = true;
+
         // Return PDF as download
         return $pdf->stream("invoice-{$invoice->id}.pdf");
     }

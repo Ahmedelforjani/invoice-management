@@ -12,8 +12,9 @@ return new class extends Migration {
             $table->foreignId('customer_id')->constrained('customers');
             $table->string('status')->default('issued');
             $table->decimal('discount')->default(0);
-            $table->decimal('subtotal');
-            $table->decimal('total');
+            $table->decimal('subtotal_amount');
+            $table->decimal('total_amount');
+            $table->decimal('total_cost')->default(0);
             $table->decimal('paid_amount')->default(0);
             $table->date('issue_date')->default(now());
             $table->text('notes')->nullable();
