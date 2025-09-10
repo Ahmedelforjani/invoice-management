@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
             $table->string('description');
-            $table->unsignedInteger('quantity')->default(1);
+            $table->decimal('quantity')->default(1);
             $table->decimal('unit_price');
             $table->decimal('total');
             $table->foreignId('invoice_id')->constrained('invoices');

@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Number;
 
 class StatsOverviewWidget extends BaseStatsOverviewWidget
 {
@@ -18,26 +19,26 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
         $invoiceQuery = Invoice::query()->notCancelled();
 
         return [
-            Stat::make("صافي الربح", $invoiceQuery->selectRaw('SUM(total_amount - total_cost) as net_profit')->value('net_profit') ?? 0)
+            Stat::make("صافي الربح", Number::format($invoiceQuery->selectRaw('SUM(total_amount - total_cost) as net_profit')->value('net_profit') ?? 0))
                 ->icon(Heroicon::OutlinedBanknotes),
 
-            Stat::make("إجمالي المستحق", $invoiceQuery->selectRaw('SUM(total_amount - paid_amount) as remaining')->value('remaining') ?? 0)
+            Stat::make("إجمالي المستحق", Number::format($invoiceQuery->selectRaw('SUM(total_amount - paid_amount) as remaining')->value('remaining') ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),
 
-            Stat::make("إجمالي المقبوض", $invoiceQuery->sum('paid_amount'))
+            Stat::make("إجمالي المقبوض", Number::format($invoiceQuery->sum('paid_amount')))
                 ->icon(HeroIcon::OutlinedArrowTrendingUp),
 
-            Stat::make("إجمالي قيمة الفواتير", $invoiceQuery->sum('total_amount'))
+            Stat::make("إجمالي قيمة الفواتير", Number::format($invoiceQuery->sum('total_amount')))
                 ->icon(InvoiceResource::getNavigationIcon()),
 
-            Stat::make("إجمالي المصروفات", Expense::sum('amount'))
+            Stat::make("إجمالي المصروفات", Number::format(Expense::sum('amount')))
                 ->icon(HeroIcon::OutlinedCurrencyDollar),
 
-            Stat::make('عدد الزبائن', Customer::count())
+            Stat::make('عدد الزبائن', Number::format(Customer::count()))
                 ->icon(CustomerResource::getNavigationIcon())
                 ->url(CustomerResource::getUrl()),
 
-            Stat::make("عدد الفواتير", Invoice::count())
+            Stat::make("عدد الفواتير", Number::format(Invoice::count()))
                 ->icon(InvoiceResource::getNavigationIcon())
                 ->url(InvoiceResource::getUrl()),
 
