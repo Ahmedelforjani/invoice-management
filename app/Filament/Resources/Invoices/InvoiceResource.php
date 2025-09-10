@@ -6,7 +6,9 @@ use App\Filament\Resources\Invoices\Pages\CreateInvoice;
 use App\Filament\Resources\Invoices\Pages\EditInvoice;
 use App\Filament\Resources\Invoices\Pages\ListInvoices;
 use App\Filament\Resources\Invoices\Pages\ViewInvoice;
+use App\Filament\Resources\Invoices\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\Invoices\RelationManagers\PaymentsRelationManager;
+use App\Filament\Resources\Invoices\RelationManagers\PurchaseItemsRelationManager;
 use App\Filament\Resources\Invoices\Schemas\InvoiceForm;
 use App\Filament\Resources\Invoices\Tables\InvoicesTable;
 use App\Models\Invoice;
@@ -43,6 +45,8 @@ class InvoiceResource extends Resource
     {
         return [
             PaymentsRelationManager::class,
+            ItemsRelationManager::class,
+            PurchaseItemsRelationManager::class
         ];
     }
 

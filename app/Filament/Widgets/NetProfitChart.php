@@ -11,7 +11,7 @@ class NetProfitChart extends ChartWidget
 {
     protected static ?int $sort = 2;
     public ?string $filter = 'month';
-    protected ?string $heading = 'صافي الارباح';
+    protected ?string $heading = 'الارباح';
 
     protected function getFilters(): ?array
     {
@@ -31,8 +31,8 @@ class NetProfitChart extends ChartWidget
             default => now()->startOfDay(),
         };
 
-        $query = Trend::query(Invoice::query()->notCancelled())
-            ->dateColumn('issue_date')
+        $query = Trend::query(Invoice::query()->notCancelled()->whereNotNull('paid_at'))
+            ->dateColumn('paid_at')
             ->between(start: $startFrom, end: now());
 
         if ($this->filter === 'week') {
@@ -50,7 +50,7 @@ class NetProfitChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'صافي الربح',
+                    'label' => 'قيمة الربح',
                     'data' => $data->map(fn(TrendValue $value) => $value->aggregate),
                     'fill' => true,
                     'tension' => 0.4,

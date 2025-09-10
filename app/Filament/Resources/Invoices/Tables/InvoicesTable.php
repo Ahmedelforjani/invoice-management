@@ -12,6 +12,7 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 
 class InvoicesTable
 {
@@ -41,7 +42,7 @@ class InvoicesTable
                 TextColumn::make('total_amount')
                     ->label('المبلغ الإجمالي')
                     ->suffix(' د.ل')
-                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                    ->formatStateUsing(fn($state) => Number::format($state))
                     ->sortable(),
 
                 TextColumn::make('issue_date')
@@ -52,16 +53,26 @@ class InvoicesTable
                 TextColumn::make('paid_amount')
                     ->label('المدفوع')
                     ->suffix(' د.ل')
-                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                    ->formatStateUsing(fn($state) => Number::format($state))
                     ->color('success')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('remaining')
                     ->label('المتبقى')
                     ->getStateUsing(fn($record) => $record->total_amount - $record->paid_amount)
                     ->suffix(' د.ل')
-                    ->formatStateUsing(fn($state) => number_format($state, 2))
-                    ->color(fn($state) => $state > 0 ? 'danger' : 'success'),
+                    ->formatStateUsing(fn($state) => Number::format($state))
+                    ->color(fn($state) => $state > 0 ? 'danger' : 'success')
+                    ->toggleable(),
+
+                TextColumn::make('net_profit')
+                    ->label('الصافي')
+                    ->getStateUsing(fn($record) => $record->total_amount - $record->total_cost)
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => Number::format($state))
+                    ->color('success')
+                    ->toggleable(),
 
                 TextColumn::make('created_at')
                     ->label('تاريخ الاضافة')

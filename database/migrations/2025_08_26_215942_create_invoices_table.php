@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->decimal('total_cost')->default(0);
             $table->decimal('paid_amount')->default(0);
             $table->date('issue_date')->default(now());
+            $table->date('paid_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

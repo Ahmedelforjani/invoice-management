@@ -4,9 +4,11 @@ namespace App\Filament\Resources\Payments\Tables;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 class PaymentsTable
 {
@@ -22,7 +24,7 @@ class PaymentsTable
                 TextColumn::make('amount')
                     ->label('القيمة')
                     ->suffix(' د.ل')
-                    ->formatStateUsing(fn($state) => number_format($state, 2))
+                    ->formatStateUsing(fn($state) => Number::format($state))
                     ->sortable(),
 
                 TextColumn::make('created_at')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\InvoiceStatus;
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Customer;
@@ -17,12 +18,23 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
     protected function getStats(): array
     {
         $invoiceQuery = Invoice::query()->notCancelled();
+        $netProfit = $invoiceQuery
+            ->clone()
+            ->whereNotNull('paid_at')
+            ->selectRaw('SUM(total_amount - total_cost) as net_profit')
+            ->value('net_profit');
+
+        $remaining = $invoiceQuery
+            ->clone()
+            ->selectRaw('SUM(total_amount - paid_amount) as remaining')
+            ->value('remaining');
 
         return [
-            Stat::make("صافي الربح", Number::format($invoiceQuery->selectRaw('SUM(total_amount - total_cost) as net_profit')->value('net_profit') ?? 0))
-                ->icon(Heroicon::OutlinedBanknotes),
+            Stat::make("الارباح", Number::format($netProfit ?? 0))
+                ->icon(Heroicon::OutlinedBanknotes)
+                ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
 
-            Stat::make("إجمالي المستحق", Number::format($invoiceQuery->selectRaw('SUM(total_amount - paid_amount) as remaining')->value('remaining') ?? 0))
+            Stat::make("إجمالي المستحق", Number::format($remaining ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),
 
             Stat::make("إجمالي المقبوض", Number::format($invoiceQuery->sum('paid_amount')))

@@ -30,11 +30,6 @@ class Invoice extends Model
         return $this->hasOne(Payment::class);
     }
 
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class);
-    }
-
     public function items(): HasMany
     {
         return $this->hasMany(InvoiceItem::class);
@@ -48,12 +43,24 @@ class Invoice extends Model
     public function updatePaidAmount(): void
     {
         $this->paid_amount = $this->payments()->sum('amount');
-        if ($this->paid_amount >= $this->total_amount) $this->status = InvoiceStatus::PAID;
+        if ($this->paid_amount >= $this->total_amount) {
+            $this->status = InvoiceStatus::PAID;
+            $this->paid_at = now();
+        } else if ($this->status == InvoiceStatus::PAID && $this->paid_amount < $this->total_amount) {
+            $this->status = InvoiceStatus::ISSUED;
+            $this->paid_at = null;
+        }
         $this->save();
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     #[scope]
-    public function notCancelled(Builder $query): Builder {
+    public function notCancelled(Builder $query): Builder
+    {
         return $query->whereNot('status', InvoiceStatus::CANCELLED);
     }
 
