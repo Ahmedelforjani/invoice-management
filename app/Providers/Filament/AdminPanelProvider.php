@@ -24,11 +24,11 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $logo = null;
+//        $logo = null;
         $settings = null;
         if (Schema::hasTable('settings')) {
             $settings = app(GeneralSettings::class);
-            $logo = $settings?->site_logo ?? null;
+//            $logo = $settings?->site_logo ?? null;
         }
 
         return $panel
@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile(EditProfile::class, false)
             ->brandName($settings?->site_name ?? config('app.name'))
-            ->brandLogo($logo ? asset("storage/$logo") : null)
+//            ->brandLogo($logo ? asset("storage/$logo") : null)
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,
