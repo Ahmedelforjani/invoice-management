@@ -17,14 +17,19 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $settings = app(GeneralSettings::class);
-        $logo = $settings?->site_logo;
+        $logo = null;
+        $settings = null;
+        if (Schema::hasTable('settings')) {
+            $settings = app(GeneralSettings::class);
+            $logo = $settings?->site_logo ?? null;
+        }
 
         return $panel
             ->default()
