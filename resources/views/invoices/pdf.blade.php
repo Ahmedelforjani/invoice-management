@@ -13,6 +13,10 @@
             box-sizing: border-box;
         }
 
+        p {
+            margin: 0;
+        }
+
         body {
             font-family: 'almarai', sans-serif !important;
             font-size: 14px;
@@ -68,17 +72,28 @@
 </head>
 
 <body>
+@php
+    $settings = app(\App\Settings\GeneralSettings::class);
+    $logo = $settings?->site_logo ? "storage/$settings->site_logo" : "images/logo.png";
+@endphp
 <div class="watermark">
-    <img src="{{ asset('/images/logo.png') }}" alt="logo" style="transform: translate(-50%, -50%) rotate(45deg) scale(1.5); opacity: 0.07" />
+    <img src="{{ $logo }}" alt="logo"
+         style="transform: translate(-50%, -50%) rotate(-45deg) scale(1.5); opacity: 0.07"/>
 </div>
 <div>
     <!-- Header -->
     <div style="margin-bottom: 20px;">
-        <div style="text-align: left; width: 50%; float:left;">
-            <img src="{{ asset('images/logo.png') }}" style="width: 75px; margin-bottom: 10px; margin-left: 35px;">
-            <div style="font-size: 24px; font-weight: 600; color: #666; margin-bottom: 5px;">
-                {{ config('app.name') }}
-            </div>
+        <div style="text-align: center; width: 120px; float:left;">
+            <img src="{{ $logo }}" style="width: 80px; margin-bottom: 10px;">
+            <p style="font-size: 20px; font-weight: 600; color: #666; margin-bottom: 5px;">
+                {{ $settings->site_name }}
+            </p>
+            @if($settings->site_phone)
+                <p style="font-size: 14px">
+                    هاتف: {{$settings->site_phone}}
+                </p>
+            @endif
+
         </div>
         <div style="text-align: right; width: 50%; float:right;">
             <div style="font-size: 36px; font-weight: 700; color: #333; margin-bottom: 10px;">فاتورة</div>
@@ -97,7 +112,9 @@
             <div style="margin-bottom: 5px;">{{ $invoice->customer->address ?? '' }}</div>
             <div style="margin-bottom: 5px;">{{ $invoice->customer->phone ?? '' }}</div>
             @if($invoice->customer->settings->show_total_remaining_in_invoice)
-            <div style="margin-bottom: 5px;">اجمالي المتبقي: <b>{{$invoice->customer->invoices->sum(fn ($item) => $item->total_amount - $item->paid_amount)}} د.ل</b></div>
+                <div style="margin-bottom: 5px;">اجمالي المتبقي:
+                    <b>{{$invoice->customer->invoices->sum(fn ($item) => $item->total_amount - $item->paid_amount)}}
+                        د.ل</b></div>
             @endif
         </div>
     </div>
@@ -141,7 +158,7 @@
                 <div style="font-size: 14px; color: #333; padding: 5px 10px;">
                     <div style="width: 50%; float: right;">المجموع</div>
                     <div style="width: 50%; float: left; text-align: left;">
-                        {{ number_format($invoice->subtotal, 2) }} د.ل
+                        {{ number_format($invoice->subtotal_amount, 2) }} د.ل
                     </div>
                 </div>
                 <div style="font-size: 14px; color: #333; padding: 5px 10px;">
@@ -154,7 +171,7 @@
             <div style="font-size: 16px; color: #333;background: #f5f5f5; padding: 10px; font-weight: bold;">
                 <div style="width: 50%; float: right;">الإجمالي</div>
                 <div style="width: 50%; float: left; text-align: left; ">
-                    {{ number_format($invoice->total, 2) }}
+                    {{ number_format($invoice->total_amount, 2) }}
                     د.ل
                 </div>
             </div>
@@ -176,9 +193,9 @@
 </div>
 
 <htmlpagefooter name="page-footer">
-    <div style="float: right; width: 33%; text-align: right">{{ now()->format('Y/m/d') }}</div>
-    <div style="float: right; width: 33%; text-align: center">{PAGENO}</div>
-    <div style="float: left; width: 33%; text-align: left"></div>
+    <div style="float: right; width: 33%; text-align: right">{PAGENO}</div>
+    <div style="float: right; width: 33%; text-align: center"></div>
+    <div style="float: left; width: 33%; text-align: left">{{ now()->format('Y/m/d') }}</div>
 </htmlpagefooter>
 </body>
 

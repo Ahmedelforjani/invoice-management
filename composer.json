@@ -9,9 +9,12 @@
         "php": "^8.2",
         "bezhansalleh/filament-language-switch": "^4.0",
         "filament/filament": "^4.0",
+        "filament/spatie-laravel-settings-plugin": "^4.0",
+        "flowframe/laravel-trend": "^0.4.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "misterspelik/laravel-pdf": "^2.2"
+        "misterspelik/laravel-pdf": "^2.2",
+        "spatie/laravel-settings": "^3.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

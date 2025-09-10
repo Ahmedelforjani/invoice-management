@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Settings\GeneralSettings;
 use Filament\Auth\Pages\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -22,13 +23,17 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $settings = app(GeneralSettings::class);
+        $logo = $settings?->site_logo;
+
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
             ->login()
             ->profile(EditProfile::class, false)
-            ->brandName(config('app.name'))
+            ->brandName($settings?->site_name ?? config('app.name'))
+            ->brandLogo($logo ? asset("storage/$logo") : null)
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Blue,

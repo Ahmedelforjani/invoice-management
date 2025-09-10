@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\InvoicePdfController;
+use App\Http\Controllers\PrintInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,7 +8,5 @@ Route::get('/', function () {
 });
 
 // Invoice PDF routes
-Route::get('/invoices/{invoice}/pdf', [InvoicePdfController::class, 'generate'])
-    ->name('invoices.pdf');
-Route::get('/invoices/{invoice}/pdf/preview', [InvoicePdfController::class, 'preview'])
-    ->name('invoices.pdf.preview');
+Route::get('/invoices/{invoice}/print', [PrintInvoiceController::class, 'index'])
+    ->name('invoices.print');

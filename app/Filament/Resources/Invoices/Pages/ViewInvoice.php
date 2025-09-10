@@ -23,7 +23,7 @@ class ViewInvoice extends ViewRecord
                 ->label('طباعة')
                 ->icon('heroicon-o-printer')
                 ->color('success')
-                ->url(fn($record) => route('invoices.pdf', $record))
+                ->url(fn($record) => route('invoices.print', $record))
                 ->openUrlInNewTab(),
         ];
     }

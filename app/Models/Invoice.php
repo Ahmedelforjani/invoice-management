@@ -52,6 +52,10 @@ class Invoice extends Model
         $this->save();
     }
 
+    #[scope]
+    public function notCancelled(Builder $query): Builder {
+        return $query->whereNot('status', InvoiceStatus::CANCELLED);
+    }
 
     #[Scope]
     public function withRemaining(Builder $query): Builder
