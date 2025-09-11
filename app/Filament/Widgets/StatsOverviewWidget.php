@@ -20,7 +20,7 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
         $invoiceQuery = Invoice::query()->notCancelled();
         $netProfit = $invoiceQuery
             ->clone()
-            ->whereNotNull('paid_at')
+            ->onlyPaid()
             ->selectRaw('SUM(total_amount - total_cost) as net_profit')
             ->value('net_profit');
 

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\InvoiceStatus;
+use App\Observers\InvoiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +13,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[ObservedBy([InvoiceObserver::class])]
 class Invoice extends Model
 {
     use HasFactory;
 
     protected $casts = [
         'issue_date' => 'date',
+        'paid_at' => 'date',
         'status' => InvoiceStatus::class
     ];
 
@@ -43,13 +47,7 @@ class Invoice extends Model
     public function updatePaidAmount(): void
     {
         $this->paid_amount = $this->payments()->sum('amount');
-        if ($this->paid_amount >= $this->total_amount) {
-            $this->status = InvoiceStatus::PAID;
-            $this->paid_at = now();
-        } else if ($this->status == InvoiceStatus::PAID && $this->paid_amount < $this->total_amount) {
-            $this->status = InvoiceStatus::ISSUED;
-            $this->paid_at = null;
-        }
+        $this->status = $this->paid_amount >= $this->total_amount ? InvoiceStatus::PAID : InvoiceStatus::ISSUED;
         $this->save();
     }
 
@@ -58,10 +56,22 @@ class Invoice extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function updatePaidAt(): void
+    {
+        $this->paid_at = $this->status == InvoiceStatus::PAID ? now() : null;
+        $this->saveQuietly();
+    }
+
     #[scope]
     public function notCancelled(Builder $query): Builder
     {
         return $query->whereNot('status', InvoiceStatus::CANCELLED);
+    }
+
+    #[scope]
+    public function onlyPaid(Builder $query): Builder
+    {
+        return $query->whereStatus(InvoiceStatus::PAID);
     }
 
     #[Scope]

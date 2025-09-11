@@ -31,7 +31,7 @@ class NetProfitChart extends ChartWidget
             default => now()->startOfDay(),
         };
 
-        $query = Trend::query(Invoice::query()->notCancelled()->whereNotNull('paid_at'))
+        $query = Trend::query(Invoice::query()->onlyPaid())
             ->dateColumn('paid_at')
             ->between(start: $startFrom, end: now());
 
@@ -63,7 +63,7 @@ class NetProfitChart extends ChartWidget
     private function formatDate($date): string
     {
         return match ($this->filter) {
-            'week', 'month' => date('M d', strtotime($date), ),
+            'week', 'month' => date('M d', strtotime($date)),
             'year' => date('M', strtotime($date)),
             default => date('h A', strtotime($date)),
         };
