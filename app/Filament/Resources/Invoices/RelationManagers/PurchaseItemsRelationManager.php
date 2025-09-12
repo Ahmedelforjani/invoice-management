@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 
 class PurchaseItemsRelationManager extends RelationManager
 {
@@ -52,15 +53,17 @@ class PurchaseItemsRelationManager extends RelationManager
                     ->searchable(),
                 TextColumn::make('quantity')
                     ->label('الكمية')
-                    ->numeric()
+                    ->formatStateUsing(fn($state) => Number::format($state))
                     ->sortable(),
                 TextColumn::make('unit_price')
                     ->label('سعر الوحدة')
-                    ->numeric()
+                    ->formatStateUsing(fn($state) => Number::format($state))
+                    ->suffix(' د.ل')    
                     ->sortable(),
                 TextColumn::make('total')
                     ->label('السعر الكلي')
-                    ->numeric()
+                    ->formatStateUsing(fn($state) => Number::format($state))
+                    ->suffix(' د.ل')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
