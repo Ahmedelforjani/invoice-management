@@ -74,6 +74,12 @@ class Invoice extends Model
         return $query->whereStatus(InvoiceStatus::PAID);
     }
 
+    #[scope]
+    public function onlyIssued(Builder $query): Builder
+    {
+        return $query->whereStatus(InvoiceStatus::ISSUED);
+    }
+
     #[Scope]
     public function withRemaining(Builder $query): Builder
     {

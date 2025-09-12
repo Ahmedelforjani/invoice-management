@@ -24,6 +24,12 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
             ->selectRaw('SUM(total_amount - total_cost) as net_profit')
             ->value('net_profit');
 
+        $unearnedProfit = $invoiceQuery
+            ->clone()
+            ->onlyIssued()
+            ->selectRaw('SUM(total_amount - total_cost) as unearned_profit')
+            ->value('unearned_profit');
+
         $remaining = $invoiceQuery
             ->clone()
             ->selectRaw('SUM(total_amount - paid_amount) as remaining')
@@ -33,6 +39,10 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
             Stat::make("الارباح", Number::format($netProfit ?? 0))
                 ->icon(Heroicon::OutlinedBanknotes)
                 ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
+
+            Stat::make("الارباح الغير محصلة", Number::format($unearnedProfit ?? 0))
+                ->icon(Heroicon::OutlinedClipboardDocument)
+                ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::ISSUED])),
 
             Stat::make("إجمالي المستحق", Number::format($remaining ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),
