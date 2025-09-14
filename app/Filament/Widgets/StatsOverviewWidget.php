@@ -8,6 +8,7 @@ use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\Withdrawal;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -52,6 +53,10 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
 
             Stat::make("إجمالي قيمة الفواتير", Number::format($invoiceQuery->sum('total_amount')))
                 ->icon(InvoiceResource::getNavigationIcon()),
+
+            Stat::make('إجمالي السحوبات', Number::format(Withdrawal::sum('amount')))
+                ->icon(Heroicon::OutlinedBanknotes)
+                ->url(url('/filament/resources/withdrawals')),
 
             Stat::make("إجمالي المصروفات", Number::format(Expense::sum('amount')))
                 ->icon(HeroIcon::OutlinedCurrencyDollar),

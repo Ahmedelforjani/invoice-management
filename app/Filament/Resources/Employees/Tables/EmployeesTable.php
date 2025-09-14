@@ -27,11 +27,18 @@ class EmployeesTable
                     ->suffix(' د.ل')
                     ->formatStateUsing(fn($state) => number_format($state, 2)),
 
+                TextColumn::make('withdrawals_sum_amount')
+                    ->label('السحوبات')
+                    ->sum('withdrawals', 'amount')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state, 2)),
+
                 TextColumn::make('created_at')
                     ->label('تاريخ الاضافة')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('updated_at')
                     ->label('تاريخ التحديث')
                     ->dateTime()

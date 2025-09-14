@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Filament\Resources\Withdrawals\Schemas;
+
+use App\Filament\Resources\Employees\RelationManagers\WithdrawalsRelationManager;
+use App\Filament\Resources\Employees\Schemas\EmployeeForm;
+use App\Models\Employee;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
+
+class WithdrawalsForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('employee_id')
+                    ->label('سحب بواسطة')
+                    ->relationship('employee',)
+                    ->getOptionLabelFromRecordUsing(fn(Employee $record) => "{$record->name} ({$record->phone})")
+                    ->createOptionForm(fn(Schema $schema) => EmployeeForm::configure($schema))
+                    ->required()
+                    ->searchable(['name', 'phone'])
+                    ->hiddenOn(WithdrawalsRelationManager::class)
+                    ->preload(),
+
+                Textarea::make('description')
+                    ->label('وصف السحب')
+                    ->required()
+                    ->rows(3),
+
+                TextInput::make('amount')
+                    ->label('القيمة')
+                    ->numeric()
+                    ->suffix('د.ل')
+                    ->required()
+                    ->minValue(0.01),
+
+                DateTimePicker::make('withdrawal_date')
+                    ->label('تاريخ السحب')
+                    ->default(now())
+                    ->required(),
+            ]);
+    }
+}

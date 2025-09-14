@@ -14,4 +14,9 @@ class Employee extends Model
     {
         return $this->hasMany(Expense::class);
     }
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
 }
