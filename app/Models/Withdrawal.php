@@ -9,9 +9,4 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Withdrawal extends Model
 {
     use hasFactory;
-
-    public function employee(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class);
-    }
 }

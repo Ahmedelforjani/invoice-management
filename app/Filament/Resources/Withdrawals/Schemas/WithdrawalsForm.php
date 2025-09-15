@@ -2,11 +2,7 @@
 
 namespace App\Filament\Resources\Withdrawals\Schemas;
 
-use App\Filament\Resources\Employees\RelationManagers\WithdrawalsRelationManager;
-use App\Filament\Resources\Employees\Schemas\EmployeeForm;
-use App\Models\Employee;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -17,16 +13,6 @@ class WithdrawalsForm
     {
         return $schema
             ->components([
-                Select::make('employee_id')
-                    ->label('سحب بواسطة')
-                    ->relationship('employee',)
-                    ->getOptionLabelFromRecordUsing(fn(Employee $record) => "{$record->name} ({$record->phone})")
-                    ->createOptionForm(fn(Schema $schema) => EmployeeForm::configure($schema))
-                    ->required()
-                    ->searchable(['name', 'phone'])
-                    ->hiddenOn(WithdrawalsRelationManager::class)
-                    ->preload(),
-
                 Textarea::make('description')
                     ->label('وصف السحب')
                     ->required()

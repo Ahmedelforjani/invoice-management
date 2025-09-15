@@ -25,6 +25,9 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
             ->selectRaw('SUM(total_amount - total_cost) as net_profit')
             ->value('net_profit');
 
+        $withdrawalsTotal = Withdrawal::sum('amount');
+        $remainingProfits = $netProfit - $withdrawalsTotal;
+
         $unearnedProfit = $invoiceQuery
             ->clone()
             ->onlyIssued()
@@ -37,6 +40,10 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
             ->value('remaining');
 
         return [
+            Stat::make("الارباح المتبقية", Number::format($remainingProfits ?? 0))
+                ->icon(Heroicon::OutlinedBanknotes)
+                ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
+
             Stat::make("الارباح", Number::format($netProfit ?? 0))
                 ->icon(Heroicon::OutlinedBanknotes)
                 ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
@@ -53,10 +60,6 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
 
             Stat::make("إجمالي قيمة الفواتير", Number::format($invoiceQuery->sum('total_amount')))
                 ->icon(InvoiceResource::getNavigationIcon()),
-
-            Stat::make('إجمالي السحوبات', Number::format(Withdrawal::sum('amount')))
-                ->icon(Heroicon::OutlinedBanknotes)
-                ->url(url('/filament/resources/withdrawals')),
 
             Stat::make("إجمالي المصروفات", Number::format(Expense::sum('amount')))
                 ->icon(HeroIcon::OutlinedCurrencyDollar),

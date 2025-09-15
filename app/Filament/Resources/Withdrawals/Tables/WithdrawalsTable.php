@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Withdrawals\Tables;
 use App\Filament\Resources\Employees\EmployeeResource;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -18,12 +20,17 @@ class WithdrawalsTable
                     ->label('#')
                     ->sortable()
                     ->searchable(),
-
-                TextColumn::make('employee.name')
-                    ->label('سحب بواسطة')
-                    ->description(fn($record) => $record->employee->phone)
-                    ->url(fn($record) => EmployeeResource::getUrl('view', ['record' => $record->employee]))
-                    ->sortable()
+                TextColumn::make('description')
+                    ->label('وصف السحب')
+                    ->limit(50)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
+                    })
+                    ->color(Color::Gray)
                     ->searchable(),
 
                 TextColumn::make('amount')->label('القيمة')

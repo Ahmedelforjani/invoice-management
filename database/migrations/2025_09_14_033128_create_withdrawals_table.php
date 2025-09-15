@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees');
             $table->decimal('amount');
-            $table->string('payment_method')->default('cash');
             $table->date('withdrawal_date')->default(now());
             $table->text('description')->nullable();
             $table->timestamps();
