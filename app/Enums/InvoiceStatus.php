@@ -2,7 +2,6 @@
 
 namespace App\Enums;
 
-use BackedEnum;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Contracts\Support\Htmlable;

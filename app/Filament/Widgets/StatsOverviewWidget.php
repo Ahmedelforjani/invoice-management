@@ -3,12 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\InvoiceStatus;
+use App\Filament\Resources\Cards\CardsResource;
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Withdrawal;
+use App\Models\Card;
 use Filament\Support\Icons\Heroicon;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -40,11 +42,11 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
             ->value('remaining');
 
         return [
-            Stat::make("الارباح المتبقية", Number::format($remainingProfits ?? 0))
+            Stat::make("الارباح", Number::format($netProfit ?? 0))
                 ->icon(Heroicon::OutlinedBanknotes)
                 ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
 
-            Stat::make("الارباح", Number::format($netProfit ?? 0))
+            Stat::make("الارباح المتبقية", Number::format($remainingProfits ?? 0))
                 ->icon(Heroicon::OutlinedBanknotes)
                 ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::PAID])),
 
@@ -52,26 +54,29 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
                 ->icon(Heroicon::OutlinedClipboardDocument)
                 ->url(InvoiceResource::getUrl(null, ['filters[status][value]' => InvoiceStatus::ISSUED])),
 
+            Stat::make("إجمالي الرصيد في البطاقات", Number::format(Card::sum('balance')))
+                ->icon(Heroicon::OutlinedCreditCard)
+                ->url(CardsResource::getUrl()),
+
             Stat::make("إجمالي المستحق", Number::format($remaining ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),
-
-            Stat::make("إجمالي المقبوض", Number::format($invoiceQuery->sum('paid_amount')))
-                ->icon(HeroIcon::OutlinedArrowTrendingUp),
 
             Stat::make("إجمالي قيمة الفواتير", Number::format($invoiceQuery->sum('total_amount')))
                 ->icon(InvoiceResource::getNavigationIcon()),
 
-            Stat::make("إجمالي المصروفات", Number::format(Expense::sum('amount')))
-                ->icon(HeroIcon::OutlinedCurrencyDollar),
-
-            Stat::make('عدد الزبائن', Number::format(Customer::count()))
-                ->icon(CustomerResource::getNavigationIcon())
-                ->url(CustomerResource::getUrl()),
+            Stat::make("إجمالي المقبوض", Number::format($invoiceQuery->sum('paid_amount')))
+                ->icon(HeroIcon::OutlinedArrowTrendingUp),
 
             Stat::make("عدد الفواتير", Number::format(Invoice::count()))
                 ->icon(InvoiceResource::getNavigationIcon())
                 ->url(InvoiceResource::getUrl()),
 
+            Stat::make('عدد الزبائن', Number::format(Customer::count()))
+                ->icon(CustomerResource::getNavigationIcon())
+                ->url(CustomerResource::getUrl()),
+
+            Stat::make("إجمالي المصروفات", Number::format(Expense::sum('amount')))
+                ->icon(HeroIcon::OutlinedCurrencyDollar),
 //            Stat::make("إجمالي تكلفة الفواتير", $invoiceQuery->sum('total_cost'))
 //                ->icon('heroicon-o-currency-dollar')
 //                ->color('danger'),
