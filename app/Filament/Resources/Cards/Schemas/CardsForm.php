@@ -25,11 +25,18 @@ class CardsForm
                     ->default(0)
                     ->suffix('$'),
 
-                Select::make('status')
-                    ->label('الحالة')
-                    ->default(CardStatus::UNPAID)
-                    ->options(CardStatus::class)
-                    ->required(),
+                TextInput::make('dues_amount')
+                    ->label('المبلغ المستحق')
+                    ->numeric()
+                    ->required()
+                    ->default(0)
+                    ->suffix('$'),
+
+//                Select::make('status')
+//                    ->label('الحالة')
+//                    ->default(CardStatus::UNPAID)
+//                    ->options(CardStatus::class)
+//                    ->required(),
             ]);
     }
 }

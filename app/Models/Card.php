@@ -21,10 +21,22 @@ class Card extends Model
         return $this->hasMany(CardPayment::class);
     }
 
+    public function duesPayments(): HasMany
+    {
+        return $this->hasMany(CardDuePayment::class);
+    }
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function ($card){
+            $card->status = $card->dues_amount <= 0 ? CardStatus::PAID : ($card->dues_amount < $card->balance ? CardStatus::PARTIALLY_PAID : CardStatus::UNPAID);
+        });
+    }
+
     public function updateBalance(float $amount): void
     {
         $this->balance += $amount;
-        $this->status = $this->balance <= 0 ? CardStatus::PAID : CardStatus::UNPAID;
         $this->save();
     }
 
@@ -32,4 +44,16 @@ class Card extends Model
     {
         return $this->balance + ($editingPayment?->amount ?? 0);
     }
+    public function maxAllowedDuePayment(?CardDuePayment $editingPayment = null): float
+    {
+        return $this->dues_amount + ($editingPayment?->amount ?? 0);
+    }
+
+    public function updateDueAmount(float $amount): void
+    {
+        $this->dues_amount += $amount;
+        $this->status = $this->dues_amount <= 0 ? CardStatus::PAID : ($this->dues_amount < $this->balance ? CardStatus::PARTIALLY_PAID : CardStatus::UNPAID);
+        $this->save();
+    }
+
 }

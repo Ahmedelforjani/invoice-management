@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Cards\RelationManagers;
 
 use App\Enums\CardStatus;
-use App\Models\CardPayment;
+use App\Models\CardDuePayment;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -11,20 +11,20 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Livewire\Component;
 
-class PaymentsHistoryRelationManager extends RelationManager
+class DuesPaymentHistoryRelationManager extends RelationManager
 {
-    protected static string $relationship = 'paymentsHistory';
+    protected static string $relationship = 'duesPayments';
 
-    protected static ?string $title = 'سجل المشتريات';
+    protected static ?string $title = 'سجل المستحقات المدفوعة';
 
     public function form(Schema $schema): Schema
     {
@@ -41,13 +41,11 @@ class PaymentsHistoryRelationManager extends RelationManager
 
                         $editingPayment = $this->getMountedAction()?->getRecord();
 
-                        return $card->maxAllowedPayment($editingPayment);
-                    })
-                    ->helperText('سيتم خصم هذه القيمة من رصيد البطاقة'),
-
+                        return $card->maxAllowedDuePayment($editingPayment);
+                    }),
 
                 DatePicker::make('payment_date')
-                    ->label('تاريخ المصروف')
+                    ->label('تاريخ الدفع')
                     ->default(now())
                     ->required(),
 
@@ -60,6 +58,7 @@ class PaymentsHistoryRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('amount')
             ->columns([
                 TextColumn::make('amount')
                     ->label('القيمة')
@@ -90,28 +89,28 @@ class PaymentsHistoryRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                ->label('إضافة دفعة')
-                ->hidden(fn() => $this->getOwnerRecord()->balance <= 0)
-                    ->after(function (CardPayment $record) {
+                    ->label('إضافة دفعة')
+                    ->hidden(fn() => $this->getOwnerRecord()->balance <= 0)
+                    ->after(function (CardDuePayment $record) {
                         $card = $this->getOwnerRecord();
-                        $card->updateBalance(-$record->amount);
+                        $card->updateDueAmount(-$record->amount);
                     }),
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make()->before(function (CardPayment $record, array $data) {
+                EditAction::make()->before(function (CardDuePayment $record, array $data) {
                     $oldAmount = $record->amount ?? 0;
                     $newAmount = $data['amount'] ?? 0;
 
                     $difference = $newAmount - $oldAmount;
 
                     $card = $this->getOwnerRecord();
-                    $card->updateBalance(-$difference);
+                    $card->updateDueAmount(-$difference);
                 }),
 
-                DeleteAction::make()->after(function (CardPayment $record) {
+                DeleteAction::make()->after(function (CardDuePayment $record) {
                     $card = $this->getOwnerRecord();
-                    $card->updateBalance($record->amount);
+                    $card->updateDueAmount($record->amount);
 
                 }),
             ])
@@ -125,9 +124,10 @@ class PaymentsHistoryRelationManager extends RelationManager
                 ]),
             ]);
     }
+
     public function isReadOnly(): bool
     {
         $card = $this->getOwnerRecord();
-        return $card->balance <= 0;
+        return $card->dues_amount <= 0;
     }
 }

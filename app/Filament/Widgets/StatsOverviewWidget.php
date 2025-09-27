@@ -58,6 +58,10 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
                 ->icon(Heroicon::OutlinedCreditCard)
                 ->url(CardsResource::getUrl()),
 
+            Stat::make("إجمالي المستحق من البطاقات", Number::format(Card::sum('dues_amount')))
+                ->icon(Heroicon::OutlinedCreditCard)
+                ->url(CardsResource::getUrl()),
+
             Stat::make("إجمالي المستحق", Number::format($remaining ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),
 

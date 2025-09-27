@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Cards;
 
 use App\Filament\Resources\Cards\Pages\ListCards;
 use App\Filament\Resources\Cards\Pages\ViewCards;
+use App\Filament\Resources\Cards\RelationManagers\DuesPaymentHistoryRelationManager;
 use App\Filament\Resources\Cards\RelationManagers\PaymentsHistoryRelationManager;
 use App\Filament\Resources\Cards\Schemas\CardsForm;
 use App\Filament\Resources\Cards\Tables\CardsTable;
@@ -20,6 +21,7 @@ class CardsResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
+    protected static ?string $recordTitleAttribute = 'name';
     protected static ?string $navigationLabel = 'البطاقات';
 
     protected static ?string $modelLabel = 'بطاقة';
@@ -27,14 +29,11 @@ class CardsResource extends Resource
     protected static ?string $pluralModelLabel = 'البطاقات';
 
     protected static ?int $navigationSort = 3;
-    protected static ?string $recordTitleAttribute = 'Cards';
 
     public static function form(Schema $schema): Schema
     {
         return CardsForm::configure($schema);
     }
-
-
 
     public static function table(Table $table): Table
     {
@@ -45,6 +44,7 @@ class CardsResource extends Resource
     {
         return [
             PaymentsHistoryRelationManager::class,
+            DuesPaymentHistoryRelationManager::class
         ];
     }
 

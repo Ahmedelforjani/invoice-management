@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('card_payment_history', function (Blueprint $table) {
+        Schema::create('card_due_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('card_id')->constrained('cards')->onDelete('cascade');
-            $table->decimal('amount');
+            $table->decimal('amount', 10, 2);
             $table->date('payment_date')->default(now());
             $table->text('notes')->nullable();
             $table->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('card_payment_history');
+        Schema::dropIfExists('card_due_payments');
     }
 };

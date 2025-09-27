@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('balance')->default('0.00');
+            $table->decimal('balance', 10,2)->default('0.00');
+            $table->decimal('dues_amount', 10,2)->default('0.00');
             $table->string('status')->default('unpaid');
             $table->timestamps();
         });

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Cards\Tables;
 
+use App\Enums\CardStatus;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -25,6 +27,11 @@ class CardsTable
                     ->suffix('$')
                     ->formatStateUsing(fn($state) => number_format($state, 2)),
 
+                TextColumn::make('dues_amount')
+                    ->label('المستحقات')
+                    ->suffix('$')
+                    ->formatStateUsing(fn($state) => number_format($state, 2)),
+
                 TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
@@ -33,15 +40,13 @@ class CardsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('الحالة')
-                    ->options([
-                        'paid' => 'مدفوعة',
-                        'unpaid' => 'غير مدفوعة',
-                    ])
+                    ->options(CardStatus::class)
                     ->searchable()
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
