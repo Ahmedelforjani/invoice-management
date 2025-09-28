@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\CardStatus;
 use App\Enums\InvoiceStatus;
 use App\Filament\Resources\Cards\CardsResource;
 use App\Filament\Resources\Customers\CustomerResource;
@@ -60,7 +61,7 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
 
             Stat::make("إجمالي المستحق من البطاقات", Number::format(Card::sum('dues_amount')))
                 ->icon(Heroicon::OutlinedCreditCard)
-                ->url(CardsResource::getUrl()),
+                ->url(CardsResource::getUrl(null, ['filters[status][values]' => [CardStatus::UNPAID, CardStatus::PARTIALLY_PAID],])),
 
             Stat::make("إجمالي المستحق", Number::format($remaining ?? 0))
                 ->icon(HeroIcon::OutlinedChartPie),

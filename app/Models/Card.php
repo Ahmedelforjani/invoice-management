@@ -29,8 +29,12 @@ class Card extends Model
     protected static function boot(){
         parent::boot();
 
-        static::creating(function ($card){
-            $card->status = $card->dues_amount <= 0 ? CardStatus::PAID : ($card->dues_amount < $card->balance ? CardStatus::PARTIALLY_PAID : CardStatus::UNPAID);
+        static::saving(function (Card $card) {
+            $card->status = $card->dues_amount <= 0
+                ? CardStatus::PAID
+                : ($card->dues_amount < $card->balance
+                    ? CardStatus::PARTIALLY_PAID
+                    : CardStatus::UNPAID);
         });
     }
 

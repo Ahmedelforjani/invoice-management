@@ -40,8 +40,8 @@ class CardsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('الحالة')
+                    ->multiple()
                     ->options(CardStatus::class)
-                    ->searchable()
             ])
             ->recordActions([
                 ViewAction::make(),
