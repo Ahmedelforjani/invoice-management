@@ -110,63 +110,63 @@ class InvoiceForm
                             ),
                     ]),
 
-                Section::make('مشتريات الفاتورة')
-                    ->description('أضف اصناف الشراء إلى هذه الفاتورة ان وجدت.')
-                    ->schema([
-                        Repeater::make('purchaseItems')
-                            ->label('اصناف الشراء')
-                            ->relationship()
-                            ->schema([
-                                TextInput::make('description')
-                                    ->label('صنف شراء')
-                                    ->required()
-                                    ->columnSpan(2),
-
-                                TextInput::make('quantity')
-                                    ->label('الكمية')
-                                    ->numeric()
-                                    ->default(1)
-                                    ->minValue(1)
-                                    ->required()
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, $set, $get) {
-                                        $unitPrice = $get('unit_price') ?? 0;
-                                        $set('total', $state * $unitPrice);
-                                        self::updateTotals($set, $get);
-                                    }),
-
-                                TextInput::make('unit_price')
-                                    ->label('سعر الوحدة')
-                                    ->numeric()
-                                    ->suffix('د.ل')
-                                    ->required()
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, $set, $get) {
-                                        $quantity = $get('quantity') ?? 1;
-                                        $set('total', $state * $quantity);
-                                        self::updateTotals($set, $get);
-                                    }),
-
-                                TextInput::make('total')
-                                    ->label('التكلفة الكلية')
-                                    ->numeric()
-                                    ->suffix('د.ل')
-                                    ->disabled()
-                                    ->dehydrated(),
-                            ])
-                            ->columns(5)
-                            ->defaultItems(0)
-                            ->addActionLabel('إضافة صنف شراء')
-                            ->reorderableWithButtons()
-                            ->collapsible()
-                            ->live()
-                            ->afterStateUpdated(function ($state, $set, $get) {
-                                self::updateTotals($set, $get);
-                            })
-                            ->deleteAction(
-                                fn($action) => $action->after(fn($set, $get) => self::updateTotals($set, $get))
-                            ),
-                    ]),
+//                Section::make('مشتريات الفاتورة')
+//                    ->description('أضف اصناف الشراء إلى هذه الفاتورة ان وجدت.')
+//                    ->schema([
+//                        Repeater::make('purchaseItems')
+//                            ->label('اصناف الشراء')
+//                            ->relationship()
+//                            ->schema([
+//                                TextInput::make('description')
+//                                    ->label('صنف شراء')
+//                                    ->required()
+//                                    ->columnSpan(2),
+//
+//                                TextInput::make('quantity')
+//                                    ->label('الكمية')
+//                                    ->numeric()
+//                                    ->default(1)
+//                                    ->minValue(1)
+//                                    ->required()
+//                                    ->live(onBlur: true)
+//                                    ->afterStateUpdated(function ($state, $set, $get) {
+//                                        $unitPrice = $get('unit_price') ?? 0;
+//                                        $set('total', $state * $unitPrice);
+//                                        self::updateTotals($set, $get);
+//                                    }),
+//
+//                                TextInput::make('unit_price')
+//                                    ->label('سعر الوحدة')
+//                                    ->numeric()
+//                                    ->suffix('د.ل')
+//                                    ->required()
+//                                    ->live(onBlur: true)
+//                                    ->afterStateUpdated(function ($state, $set, $get) {
+//                                        $quantity = $get('quantity') ?? 1;
+//                                        $set('total', $state * $quantity);
+//                                        self::updateTotals($set, $get);
+//                                    }),
+//
+//                                TextInput::make('total')
+//                                    ->label('التكلفة الكلية')
+//                                    ->numeric()
+//                                    ->suffix('د.ل')
+//                                    ->disabled()
+//                                    ->dehydrated(),
+//                            ])
+//                            ->columns(5)
+//                            ->defaultItems(0)
+//                            ->addActionLabel('إضافة صنف شراء')
+//                            ->reorderableWithButtons()
+//                            ->collapsible()
+//                            ->live()
+//                            ->afterStateUpdated(function ($state, $set, $get) {
+//                                self::updateTotals($set, $get);
+//                            })
+//                            ->deleteAction(
+//                                fn($action) => $action->after(fn($set, $get) => self::updateTotals($set, $get))
+//                            ),
+//                    ]),
 
                 Section::make('قيمة الفاتورة')
                     ->schema([

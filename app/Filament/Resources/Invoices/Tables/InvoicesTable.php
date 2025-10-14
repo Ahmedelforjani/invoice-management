@@ -33,6 +33,13 @@ class InvoicesTable
                     ->hiddenOn(InvoicesRelationManager::class)
                     ->searchable(),
 
+
+                TextColumn::make('order_id')
+                    ->label('رقم الطلبية')
+                    ->sortable()
+                    ->copyable()
+                    ->searchable(),
+
                 TextColumn::make('status')
                     ->label('الحالة')
                     ->badge()
@@ -92,7 +99,7 @@ class InvoicesTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make(),
+//                EditAction::make(),
                 Action::make('print')
                     ->label('طباعة')
                     ->icon('heroicon-o-printer')

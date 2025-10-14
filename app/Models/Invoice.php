@@ -24,6 +24,15 @@ class Invoice extends Model
         'status' => InvoiceStatus::class
     ];
 
+    protected $fillable = [
+        'customer_id',
+        'order_id',
+        'subtotal_amount',
+        'total_amount',
+        'total_cost',
+        'issue_date',
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
