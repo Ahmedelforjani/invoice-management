@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create([
             'name' => 'Admin',
-            'email' => 'admin@forjani.dev',
+            'email' => 'admin@admin.me',
             'password' => Hash::make('password'),
         ]);
     }
