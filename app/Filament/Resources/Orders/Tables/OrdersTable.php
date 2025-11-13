@@ -54,16 +54,6 @@ class OrdersTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->before(function (Collection $records) {
-                            foreach ($records as $order) {
-                                $order->cancelInvoice();
-                            }
-
-                            Notification::make()
-                                ->title('تم إلغاء الفواتير المرتبطة بنجاح')
-                                ->success()
-                                ->send();
-                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

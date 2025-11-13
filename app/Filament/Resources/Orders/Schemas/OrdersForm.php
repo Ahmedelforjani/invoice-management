@@ -98,6 +98,7 @@
                                                 ->label('تكلفة الوحدة')
                                                 ->numeric()
                                                 ->suffix('د.ل')
+                                                ->default(0)
                                                 ->required()
                                                 ->live(onBlur: true)
                                                 ->afterStateUpdated(function ($state, $set, $get) {

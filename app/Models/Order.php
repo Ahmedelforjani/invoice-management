@@ -23,6 +23,12 @@ class Order extends Model
         'status' => OrderStatus::class
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function (Order $order) {
+            $order->cancelInvoice();
+        });
+    }
 
     public function customers(): HasMany
     {
