@@ -181,6 +181,17 @@
                                 ->disabled()
                                 ->dehydrated(),
 
+                            TextInput::make('shipping_cost')
+                                ->label('تكلفة الشحن')
+                                ->numeric()
+                                ->suffix('د.ل')
+                                ->default(0)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function($state, $set, $get){
+                                    self::updateTotals($set, $get);
+                                }),
+
+
                             TextInput::make('total_amount')
                                 ->label('المبلغ الإجمالي')
                                 ->numeric()
@@ -248,6 +259,7 @@
             $orderSubtotal = 0;
             $orderTotalCost = 0;
             $totalDiscount = 0;
+            $shippingCost = (float) ($get('shipping_cost') ?? 0);
 
             foreach ($customers as $index => $customer) {
                 $items = $customer['items'] ?? [];
@@ -276,6 +288,7 @@
                 $totalDiscount += $discount;
             }
 
+            $orderTotalCost += $shippingCost;
             $orderTotal = $orderSubtotal - $totalDiscount;
             $netProfit = $orderTotal - $orderTotalCost;
 

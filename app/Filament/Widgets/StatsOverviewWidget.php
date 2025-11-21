@@ -10,6 +10,7 @@ use App\Filament\Resources\Invoices\InvoiceResource;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\Withdrawal;
 use App\Models\Card;
 use Filament\Support\Icons\Heroicon;
@@ -22,25 +23,36 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
     protected function getStats(): array
     {
         $invoiceQuery = Invoice::query()->notCancelled();
-        $netProfit = $invoiceQuery
+        $paidInvoiceProfit  = $invoiceQuery
             ->clone()
             ->onlyPaid()
             ->selectRaw('SUM(total_amount - total_cost) as net_profit')
             ->value('net_profit');
 
-        $withdrawalsTotal = Withdrawal::sum('amount');
-        $remainingProfits = $netProfit - $withdrawalsTotal;
-
-        $unearnedProfit = $invoiceQuery
+        $unpaidInvoiceProfit  = $invoiceQuery
             ->clone()
             ->onlyIssued()
             ->selectRaw('SUM(total_amount - total_cost) as unearned_profit')
             ->value('unearned_profit');
 
+        $shippingPaid = Order::whereHas('invoices', fn ($q) =>
+            $q->onlyPaid()
+        )->sum('shipping_cost');
+
+        $shippingUnpaid = Order::whereHas('invoices', fn ($q) =>
+            $q->onlyIssued()
+        )->sum('shipping_cost');
+
+        $netProfit = $paidInvoiceProfit - $shippingPaid;
+        $unearnedProfit = $unpaidInvoiceProfit - $shippingUnpaid;
+
         $remaining = $invoiceQuery
             ->clone()
             ->selectRaw('SUM(total_amount - paid_amount) as remaining')
             ->value('remaining');
+
+        $withdrawalsTotal = Withdrawal::sum('amount');
+        $remainingProfits = $netProfit - $withdrawalsTotal;
 
         return [
             Stat::make("الارباح", Number::format($netProfit ?? 0))

@@ -30,6 +30,11 @@ class Order extends Model
         });
     }
 
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function customers(): HasMany
     {
         return $this->hasMany(OrderCustomer::class);

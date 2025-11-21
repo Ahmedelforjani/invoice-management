@@ -35,6 +35,12 @@ class OrdersTable
                     ->formatStateUsing(fn($state) => number_format($state))
                     ->sortable(),
 
+                TextColumn::make('shipping_cost')
+                    ->label('تكلفة الشحن')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state))
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('تاريخ الطلبية')
                     ->date()
