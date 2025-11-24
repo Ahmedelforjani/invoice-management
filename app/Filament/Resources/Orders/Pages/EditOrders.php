@@ -3,8 +3,7 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Filament\Resources\Orders\OrdersResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
+use App\Services\InvoiceService;
 use Filament\Resources\Pages\EditRecord;
 
 class EditOrders extends EditRecord
@@ -13,16 +12,14 @@ class EditOrders extends EditRecord
 
     protected function afterSave(): void
     {
-        foreach ($this->record->customers as $customer) {
-            $customer->updateInvoice();
-        }
-    }
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            ViewAction::make(),
-            DeleteAction::make(),
-        ];
+        $invoiceService = app(InvoiceService::class);
+
+        $this->record->refresh();
+        $this->record->load('customers.items');
+
+        foreach ($this->record->customers as $customer) {
+            $invoiceService->updateInvoice($customer);
+        }
     }
 }

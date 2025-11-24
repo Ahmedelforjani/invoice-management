@@ -57,7 +57,13 @@
                                         ->required()
                                         ->searchable(['name', 'phone'])
                                         ->columnSpanFull()
-                                        ->preload(),
+                                        ->preload()
+                                        ->live()
+                                        ->afterStateUpdated(function($state, $set, $get){
+                                            $rootGet = fn($key) => $get('../../' . $key);
+                                            $rootSet = fn($key, $value) => $set('../../' . $key, $value);
+                                            self::updateTotals($rootSet, $rootGet);
+                                        }),
 
                                     Repeater::make('items')
                                         ->label('المنتجات')
@@ -65,7 +71,13 @@
                                         ->schema([
                                             TextInput::make('product_name')
                                                 ->label('المنتج')
-                                                ->required(),
+                                                ->required()
+                                                ->live(onBlur: true)
+                                                ->afterStateUpdated(function ($set, $get) {
+                                                    $rootGet = fn($key) => $get('../../../../' . $key);
+                                                    $rootSet = fn($key, $value) => $set('../../../../' . $key, $value);
+                                                    self::updateTotals($rootSet, $rootGet);
+                                                }),
 
                                             TextInput::make('quantity')
                                                 ->label('الكمية')
@@ -77,8 +89,9 @@
                                                 ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                                     $set('total', ($get('quantity') ?? 1) * ($get('unit_price') ?? 0));
 
-                                                    self::updateCustomerTotals($set, $get);
-                                                    self::updateTotals($set, $get);
+                                                    $rootGet = fn($key) => $get('../../../../' . $key);
+                                                    $rootSet = fn($key, $value) => $set('../../../../' . $key, $value);
+                                                    self::updateTotals($rootSet, $rootGet);
                                                 }),
 
                                             TextInput::make('unit_price')
@@ -90,8 +103,9 @@
                                                 ->afterStateUpdated(function ($state, $set, $get) {
                                                     $set('total', ($get('quantity') ?? 1) * $state);
 
-                                                    self::updateCustomerTotals($set, $get);
-                                                    self::updateTotals($set, $get);
+                                                    $rootGet = fn($key) => $get('../../../../' . $key);
+                                                    $rootSet = fn($key, $value) => $set('../../../../' . $key, $value);
+                                                    self::updateTotals($rootSet, $rootGet);
                                                 }),
 
                                             TextInput::make('cost_price')
@@ -102,8 +116,9 @@
                                                 ->required()
                                                 ->live(onBlur: true)
                                                 ->afterStateUpdated(function ($state, $set, $get) {
-                                                    self::updateCustomerTotals($set, $get);
-                                                    self::updateTotals($set, $get);
+                                                    $rootGet = fn($key) => $get('../../../../' . $key);
+                                                    $rootSet = fn($key, $value) => $set('../../../../' . $key, $value);
+                                                    self::updateTotals($rootSet, $rootGet);
                                                 }),
 
                                             TextInput::make('total')
@@ -114,7 +129,9 @@
                                         ])
                                         ->columns(5)
                                         ->afterStateUpdated(function($state, $set, $get){
-                                            self::updateTotals($set, $get);
+                                            $rootGet = fn($key) => $get('../../' . $key);
+                                            $rootSet = fn($key, $value) => $set('../../' . $key, $value);
+                                            self::updateTotals($rootSet, $rootGet);
                                         })
                                         ->live()
                                         ->columnSpanFull()
@@ -211,61 +228,39 @@
                                 ->numeric()
                                 ->suffix('د.ل')
                                 ->disabled()
-                                ->dehydrated(false),
+                                ->dehydrated(false)
+                            ->formatStateUsing(function ($record) {
+                                if (!$record) {
+                                    return 0;
+                                }
+
+                                $profit = $record->total_amount - $record->total_cost;
+
+                                return number_format($profit, 2, '.', '');
+                            }),
                         ])
                         ->columns(3),
-    //                    Section::make('دفعة أولية (عربون)')
-    //                        ->description('إدارة الدفعة الأولية للطلبية.')
-    //                        ->schema([
-    //                            TextInput::make('paid_amount')
-    //                                ->label('الدفعة الأولية')
-    //                                ->numeric()
-    //                                ->default(0)
-    //                                ->suffix('د.ل')
-    //                                ->required(),
-    //                        ])
-    //                        ->hiddenOn('edit')
                 ])->columns(1);
-        }
-
-        public static function updateCustomerTotals($set, $get): void
-        {
-            $items = $get('../../items') ?? [];
-            $discount = (float) ($get('../../discount_amount') ?? 0);
-
-            $subtotal = 0;
-            $totalCost = 0;
-
-            foreach ($items as $item) {
-                $qty = (float) ($item['quantity'] ?? 0);
-                $unitPrice = (float) ($item['unit_price'] ?? 0);
-                $costPrice = (float) ($item['cost_price'] ?? 0);
-
-                $subtotal += $qty * $unitPrice;
-                $totalCost += $qty * $costPrice;
-            }
-
-            $total = $subtotal - $discount;
-
-            $set('../../subtotal_amount', number_format($subtotal, 2, '.', ''));
-            $set('../../total_cost', number_format($totalCost, 2, '.', ''));
-            $set('../../total_amount', number_format($total, 2, '.', ''));
         }
 
         public static function updateTotals($set, $get): void
         {
+            $shippingCost = (float) ($get('shipping_cost') ?? 0);
+
             $customers = $get('customers') ?? [];
+
+            $customerCount = count($customers);
+            $shippingSharePerCustomer = $customerCount > 0 ? $shippingCost / $customerCount : 0;
 
             $orderSubtotal = 0;
             $orderTotalCost = 0;
             $totalDiscount = 0;
-            $shippingCost = (float) ($get('shipping_cost') ?? 0);
 
             foreach ($customers as $index => $customer) {
                 $items = $customer['items'] ?? [];
 
                 $customerSubtotal = 0;
-                $customerTotalCost = 0;
+                $customerItemsCost = 0;
 
                 foreach ($items as $item) {
                     $qty = (float) ($item['quantity'] ?? 0);
@@ -273,11 +268,12 @@
                     $costPrice = (float) ($item['cost_price'] ?? 0);
 
                     $customerSubtotal += $qty * $unitPrice;
-                    $customerTotalCost += $qty * $costPrice;
+                    $customerItemsCost += $qty * $costPrice;
                 }
 
                 $discount = (float) ($customer['discount_amount'] ?? 0);
                 $customerTotal = $customerSubtotal - $discount;
+                $customerTotalCost = $customerItemsCost + $shippingSharePerCustomer;
 
                 $set("customers.$index.subtotal_amount", number_format($customerSubtotal, 2, '.', ''));
                 $set("customers.$index.total_cost", number_format($customerTotalCost, 2, '.', ''));
@@ -288,7 +284,6 @@
                 $totalDiscount += $discount;
             }
 
-            $orderTotalCost += $shippingCost;
             $orderTotal = $orderSubtotal - $totalDiscount;
             $netProfit = $orderTotal - $orderTotalCost;
 
