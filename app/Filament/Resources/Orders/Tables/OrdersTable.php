@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,6 +42,12 @@ class OrdersTable
                     ->formatStateUsing(fn($state) => number_format($state))
                     ->sortable(),
 
+                TextColumn::make('total_cost')
+                    ->label('التكلفة الإجمالية')
+                    ->suffix(' د.ل')
+                    ->formatStateUsing(fn($state) => number_format($state))
+                    ->sortable(),
+
                 TextColumn::make('created_at')
                     ->label('تاريخ الطلبية')
                     ->date()
@@ -56,6 +63,7 @@ class OrdersTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make()
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

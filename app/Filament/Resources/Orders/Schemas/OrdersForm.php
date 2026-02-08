@@ -229,15 +229,15 @@
                                 ->suffix('د.ل')
                                 ->disabled()
                                 ->dehydrated(false)
-                            ->formatStateUsing(function ($record) {
-                                if (!$record) {
-                                    return 0;
-                                }
+                                ->formatStateUsing(function ($record) {
+                                    if (!$record) {
+                                        return 0;
+                                    }
 
-                                $profit = $record->total_amount - $record->total_cost;
+                                    $profit = $record->total_amount - $record->total_cost;
 
-                                return number_format($profit, 2, '.', '');
-                            }),
+                                    return number_format($profit, 2, '.', '');
+                                }),
                         ])
                         ->columns(3),
                 ])->columns(1);
