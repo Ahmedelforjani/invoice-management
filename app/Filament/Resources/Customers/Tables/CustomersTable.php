@@ -48,8 +48,8 @@ class CustomersTable
                 TextColumn::make('invoices_sum_remaining')
                     ->label('اجمالي المتبقي')
                     ->suffix(' د.ل')
-                    ->state(fn(Customer $record) => $record->invoices->sum(fn ($item) => $item->total_amount - $item->paid_amount)),
-
+                    ->state(fn(Customer $record) => $record->invoices()->notCancelled()->selectRaw('SUM(total_amount - paid_amount) as remaining')->value('remaining') ?? 0),
+                    
                 ToggleColumn::make('settings.show_total_remaining_in_invoice')
                     ->label('عرض المتبقي في الفاتورة؟'),
 

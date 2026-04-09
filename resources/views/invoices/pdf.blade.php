@@ -113,7 +113,7 @@
             <div style="margin-bottom: 5px;">{{ $invoice->customer->phone ?? '' }}</div>
             @if($invoice->customer->settings->show_total_remaining_in_invoice)
                 <div style="margin-bottom: 5px;">اجمالي المتبقي:
-                    <b>{{$invoice->customer->invoices->sum(fn ($item) => $item->total_amount - $item->paid_amount)}}
+                    <b>{{$invoice->customer->invoices()->notCancelled()->selectRaw('SUM(total_amount - paid_amount) as remaining')->value('remaining') ?? 0}}
                         د.ل</b></div>
             @endif
         </div>
